@@ -1,187 +1,64 @@
 #!/bin/bash
-# ================================================================
-#  NYX-ROUTER v2.2.0
-#  General Purpose AI Router with 3 Modes
-#  GitHub: https://github.com/yourusername/nyx-router
-# ================================================================
-
 set -e
-
 NYX_ROOT="${NYX_ROOT:-$HOME/.nyx-router}"
 
-# ==================== SHOW LOGO ====================
 show_logo() {
-    cat << 'EOF'
+    cat << 'LOGO'
 ╔═══════════════════════════════════════════════════════════════════╗
-║                                                                   ║
 ║   ███╗   ██╗██╗   ██╗██╗  ██╗                                    ║
 ║   ████╗  ██║╚██╗ ██╔╝╚██╗██╔╝                                    ║
 ║   ██╔██╗ ██║ ╚████╔╝  ╚███╔╝                                     ║
 ║   ██║╚██╗██║  ╚██╔╝   ██╔██╗                                     ║
 ║   ██║ ╚████║   ██║   ██╔╝ ██╗                                    ║
 ║   ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝                                    ║
-║                                                                   ║
-║   ██████╗  ██████╗ ██╗   ██╗████████╗███████╗██████╗             ║
-║   ██╔══██╗██╔═══██╗██║   ██║╚══██╔══╝██╔════╝██╔══██╗            ║
-║   ██████╔╝██║   ██║██║   ██║   ██║   █████╗  ██████╔╝            ║
-║   ██╔══██╗██║   ██║██║   ██║   ██║   ██╔══╝  ██╔══██╗            ║
-║   ██║  ██║╚██████╔╝╚██████╔╝   ██║   ███████╗██║  ██║            ║
-║   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═╝            ║
-║                                                                   ║
-║                ✨ General Purpose AI Router ✨                    ║
+║                ✨ NYX-ROUTER v2.2.0 ✨                           ║
 ║              Single | Swarm | Orchestrate                         ║
-║                   v2.2.0 · MIT License                           ║
 ╚═══════════════════════════════════════════════════════════════════╝
-EOF
+LOGO
 }
 
-# ==================== HELP ====================
 show_help() {
     show_logo
-    cat << 'EOF'
+    cat << 'HELP'
 
-USAGE:
-  nyx [MODE] [OPTIONS] "prompt"
-
-MODES:
-  1, single     - 1 AI terbaik (cepat, murah)
-  2, swarm      - Semua AI paralel + voting (komprehensif)
-  3, orch       - AI lempar + verifikasi (paling cerdas)
-
-OPTIONS:
-  --ai NAME     - Pilih AI spesifik (contoh: --ai claude)
-  --max N       - Max iterasi untuk mode orch (default: 3)
-  --free        - Prioritaskan model gratis
-  --no-logo     - Skip logo
-  -h, --help    - Tampilkan bantuan
-  -v, --version - Tampilkan versi
-
-AI AVAILABLE (44 Free Models):
-  local-*       - Ollama (Llama 3.2, Qwen 2.5, DeepSeek)
-  openrouter-*  - OpenRouter (GPT-OSS, Qwen, Llama, Mistral)
-  groq-*        - Groq (Llama 3.3, Gemma 2, Mixtral)
-  gemini-*      - Google Gemini (Flash, Pro)
-  nvidia-*      - NVIDIA NIM (Llama, Mistral, Qwen, Nemotron)
-  cerebras-*    - Cerebras (Llama 3.3, Gemma)
-  mistral-*     - Mistral (Codestral, Small, Large)
-  cloudflare-*  - Cloudflare (Llama, Gemma, Mistral)
-  github-*      - GitHub Models (GPT-4o, Llama)
-  hf-*          - HuggingFace (Llama, Mistral, Qwen)
-  ovh-*         - OVHcloud (No API key!)
-  llm7-*        - LLM7 (No API key!)
-
-TASK TYPES (auto-detect):
-  coding, debugging, architecture, writing, translation,
-  summarization, research, data_analysis, creative,
-  educational, general, simple_qa
-
+USAGE: nyx [MODE] [OPTIONS] "prompt"
+MODES: 1,single | 2,swarm | 3,orch
+OPTIONS: --ai NAME | --max N | --free | -h | -v
 EXAMPLES:
-  nyx single "Buat REST API dengan FastAPI"
-  nyx swarm "Tulis artikel tentang AI"
-  nyx orch "Research tentang blockchain" --max 5
-  nyx single --ai claude "Debug error ini"
-  nyx single "Buat kode" --free
-  nyx ui       # Buka Web UI
-
-ENVIRONMENT:
-  OPENROUTER_API_KEY  - OpenRouter API key (free)
-  GROQ_API_KEY        - Groq API key (free)
-  GOOGLE_API_KEY      - Google Gemini API key (free)
-  NVIDIA_API_KEY      - NVIDIA NIM API key (free)
-  CEREBRAS_API_KEY    - Cerebras API key (free)
-  MISTRAL_API_KEY     - Mistral API key (free)
-  CLOUDFLARE_API_KEY  - Cloudflare API key (free)
-  CLOUDFLARE_ACCOUNT_ID - Cloudflare account ID
-  GITHUB_TOKEN        - GitHub token (beta)
-  HF_TOKEN            - HuggingFace token (free)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EOF
+  nyx single "Buat REST API"
+  nyx swarm "Tulis artikel"
+  nyx orch "Research" --max 5
+  nyx ui
+HELP
 }
 
-# ==================== VERSION ====================
-show_version() {
-    echo "🌙 NYX-ROUTER v2.2.0"
-    echo "   47+ Models, 44 Free Models, 14 Providers"
-    echo "   MIT License"
-    echo "   https://github.com/yourusername/nyx-router"
-}
+start_ui() { echo "🌙 Starting UI at http://localhost:7860"; python3 "$NYX_ROOT/web_ui.py"; }
 
-# ==================== UI ====================
-start_ui() {
-    echo "🌙 Starting NYX-ROUTER Web UI..."
-    echo "   Open http://localhost:7860"
-    echo ""
-    python3 "$NYX_ROOT/web-ui.py"
-}
-
-# ==================== MAIN ====================
 main() {
-    local mode=""
-    local ai=""
-    local max_iter=3
-    local prompt=""
-    local free_flag=""
-    local show_logo_flag=true
-
-    if [ "$1" = "ui" ]; then
-        start_ui
-        exit 0
-    fi
-
+    if [ "$1" = "ui" ]; then start_ui; exit 0; fi
+    local mode="" ai="" max_iter=3 prompt="" free_flag=""
     while [[ $# -gt 0 ]]; do
         case $1 in
-            1|single)    mode="single"; shift ;;
-            2|swarm)     mode="swarm"; shift ;;
-            3|orch)      mode="orch"; shift ;;
-            --ai)        ai="$2"; shift 2 ;;
-            --max)       max_iter="$2"; shift 2 ;;
-            --free)      free_flag="--free"; shift ;;
-            --no-logo)   show_logo_flag=false; shift ;;
-            -h|--help)   show_help; exit 0 ;;
-            -v|--version) show_version; exit 0 ;;
-            ui)          start_ui; exit 0 ;;
-            *)           prompt="$prompt $1"; shift ;;
+            1|single) mode="single"; shift ;;
+            2|swarm) mode="swarm"; shift ;;
+            3|orch) mode="orch"; shift ;;
+            --ai) ai="$2"; shift 2 ;;
+            --max) max_iter="$2"; shift 2 ;;
+            --free) free_flag="--free"; shift ;;
+            -h|--help) show_help; exit 0 ;;
+            -v|--version) echo "NYX-ROUTER v2.2.0"; exit 0 ;;
+            *) prompt="$prompt $1"; shift ;;
         esac
     done
-
     prompt=$(echo "$prompt" | xargs)
-
-    if [ -z "$mode" ] || [ -z "$prompt" ]; then
-        show_help
-        exit 1
-    fi
-
-    if [ "$show_logo_flag" = true ]; then
-        show_logo
-        echo ""
-    fi
-
+    if [ -z "$mode" ] || [ -z "$prompt" ]; then show_help; exit 1; fi
+    show_logo; echo ""
     case "$mode" in
-        single|orch)
-            python3 "$NYX_ROOT/core.py" "$mode" --ai "$ai" --max "$max_iter" $free_flag "$prompt"
-            ;;
-        swarm)
-            if command -v node &> /dev/null; then
-                node "$NYX_ROOT/swarm.js" "$prompt" $free_flag
-            else
-                echo "❌ Node.js not found. Install with: sudo apt install nodejs"
-                exit 1
-            fi
-            ;;
-        *)
-            echo "❌ Mode '$mode' tidak dikenal"
-            exit 1
-            ;;
+        single|orch) python3 "$NYX_ROOT/core.py" "$mode" --ai "$ai" --max "$max_iter" $free_flag "$prompt" ;;
+        swarm) node "$NYX_ROOT/swarm.js" "$prompt" ;;
+        *) echo "❌ Mode tidak dikenal"; exit 1 ;;
     esac
 }
 
 export NYX_ROOT="${NYX_ROOT:-$HOME/.nyx-router}"
-export PATH="$NYX_ROOT/bin:$PATH"
-
-if ! command -v python3 &> /dev/null; then
-    echo "❌ Python3 not found. Please install Python3."
-    exit 1
-fi
-
 main "$@"

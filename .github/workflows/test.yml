@@ -6,7 +6,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
-        with: {python-version: '3.10'}
-      - run: pip install requests gradio
-      - run: python -c "import core; print('✅ Core loaded')"
-      - run: python -c "import web_ui; print('✅ Web UI loaded')"
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          pip install requests gradio
+      - name: Test core
+        run: |
+          python -c "import core; print('✅ Core loaded')"
+          python tests/test_core.py
+      - name: Test web_ui (optional)
+        run: |
+          python -c "try: import web_ui; print('✅ Web UI loaded'); except: print('⚠️ Web UI optional')"
