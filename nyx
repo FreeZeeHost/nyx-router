@@ -1,63 +1,13 @@
 #!/bin/bash
-set -e
 NYX_ROOT="${NYX_ROOT:-$HOME/.nyx-router}"
 
-show_logo() {
-    cat << 'LOGO'
-╔═══════════════════════════════════════════════════════════════════╗
-║   ███╗   ██╗██╗   ██╗██╗  ██╗                                    ║
-║   ████╗  ██║╚██╗ ██╔╝╚██╗██╔╝                                    ║
-║   ██╔██╗ ██║ ╚████╔╝  ╚███╔╝                                     ║
-║   ██║╚██╗██║  ╚██╔╝   ██╔██╗                                     ║
-║   ██║ ╚████║   ██║   ██╔╝ ██╗                                    ║
-║   ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝                                    ║
-║                ✨ NYX-ROUTER v2.2.0 ✨                           ║
-║              Single | Swarm | Orchestrate                         ║
-╚═══════════════════════════════════════════════════════════════════╝
-LOGO
-}
-
-show_help() {
-    show_logo
-    cat << 'HELP'
-
-USAGE: nyx [MODE] [OPTIONS] "prompt"
-MODES: 1,single | 2,swarm | 3,orch
-OPTIONS: --ai NAME | --max N | --free | -h | -v
-EXAMPLES:
-  nyx single "Buat REST API"
-  nyx swarm "Tulis artikel"
-  nyx orch "Research" --max 5
-  nyx ui
-HELP
-}
-
-start_ui() { echo "🌙 Starting UI at http://localhost:7860"; python3 "$NYX_ROOT/web_ui.py"; }
-
 main() {
-    if [ "$1" = "ui" ]; then start_ui; exit 0; fi
-    local mode="" ai="" max_iter=3 prompt="" free_flag=""
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            1|single) mode="single"; shift ;;
-            2|swarm) mode="swarm"; shift ;;
-            3|orch) mode="orch"; shift ;;
-            --ai) ai="$2"; shift 2 ;;
-            --max) max_iter="$2"; shift 2 ;;
-            --free) free_flag="--free"; shift ;;
-            -h|--help) show_help; exit 0 ;;
-            -v|--version) echo "NYX-ROUTER v2.2.0"; exit 0 ;;
-            *) prompt="$prompt $1"; shift ;;
-        esac
-    done
-    prompt=$(echo "$prompt" | xargs)
-    if [ -z "$mode" ] || [ -z "$prompt" ]; then show_help; exit 1; fi
-    show_logo; echo ""
-    case "$mode" in
-        single|orch) python3 "$NYX_ROOT/core.py" "$mode" --ai "$ai" --max "$max_iter" $free_flag "$prompt" ;;
-        swarm) node "$NYX_ROOT/swarm.js" "$prompt" ;;
-        *) echo "❌ Mode tidak dikenal"; exit 1 ;;
-    esac
+    if [ "$1" = "ui" ]; then
+        echo "🌙 Starting UI at http://localhost:7860"
+        python3 "$NYX_ROOT/web_ui.py"
+        exit 0
+    fi
+    python3 "$NYX_ROOT/core.py" "$@"
 }
 
 export NYX_ROOT="${NYX_ROOT:-$HOME/.nyx-router}"
